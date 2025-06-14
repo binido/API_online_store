@@ -1,25 +1,34 @@
-from fastapi import APIRouter, HTTPException, status
+from typing import Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+
+from src.dependencies import get_pagination_params, get_sort_params
+from src.schemas import PaginatedResponse, PaginationParams, SortParams
 
 from .schemas import SCategoryCreate, SCategoryRead, SCategoryUpdate
 from .service import (
     create_category,
     delete_category,
     get_category,
-    list_categories,
+    list_categories_paginated,
     update_category,
 )
 
 router = APIRouter(prefix="/categories", tags=["Categories"])
 
 
+@router.get("/", response_model=PaginatedResponse[SCategoryRead])
+async def get_categories_view(
+    pagination: PaginationParams = Depends(get_pagination_params),
+    sort: SortParams = Depends(get_sort_params),
+    name: Optional[str] = Query(None, description="Фильтр по названию"),
+) -> PaginatedResponse[SCategoryRead]:
+    return await list_categories_paginated(pagination=pagination, sort=sort, name=name)
+
+
 @router.post("/", response_model=SCategoryRead, status_code=status.HTTP_201_CREATED)
 async def create_category_view(schema: SCategoryCreate) -> SCategoryRead:
     return await create_category(schema)
-
-
-@router.get("/", response_model=list[SCategoryRead])
-async def get_categories_view() -> list[SCategoryRead]:
-    return await list_categories()
 
 
 @router.get("/{category_id}", response_model=SCategoryRead)

@@ -8,10 +8,11 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+from src.categories.models import Category  # noqa
 from src.config import settings
 from src.database import Base
 from src.orders.models import Order, OrderItem  # noqa Для алембика оч надо
-from src.categories.models import Category, Product  # noqa
+from src.products.models import Product  # noqa
 from src.users.models import User  # noqa
 
 target_metadata = Base.metadata
