@@ -1,6 +1,11 @@
-from fastapi import Query
+from fastapi import Depends, HTTPException, Query, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+from src.auth.utils import verify_token
 from src.schemas import PaginationParams, SortDirection, SortParams
+from src.users.dao import UserDAO
+
+security = HTTPBearer()
 
 
 def get_pagination_params(
@@ -17,3 +22,53 @@ def get_sort_params(
     ),
 ) -> SortParams:
     return SortParams(order_by=order_by, order_direction=order_direction)
+
+
+async def get_current_user(token: HTTPAuthorizationCredentials = Depends(security)):
+    payload = verify_token(token.credentials)
+    if payload is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Недействительный токен",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    user_id = payload.get("user_id")
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Недействительный токен",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    user = await UserDAO.find_by_id(user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+        )
+    return user
+
+
+# async def get_current_user(request: Request):
+#     token = request.cookies.get("access_token")
+#     if not token:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED, detail="No token in cookies"
+#         )
+
+#     try:
+#         payload = jwt.decode(
+#             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+#         )
+#         user_id = int(payload.get("sub"))
+#     except (JWTError, ValueError):
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+#         )
+
+#     user = await UserDAO.find_by_id(user_id)
+#     if not user:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+#         )
+#     return user
