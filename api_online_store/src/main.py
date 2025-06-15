@@ -46,6 +46,6 @@ app.include_router(orders_router, prefix="/api/v1")
 
 
 @app.get("/ping")
-async def pong():
+async def ping():
     # await asyncio.sleep(3)
     return {"data": "pong"}

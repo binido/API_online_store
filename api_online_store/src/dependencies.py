@@ -47,28 +47,3 @@ async def get_current_user(token: HTTPAuthorizationCredentials = Depends(securit
             status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
         )
     return user
-
-
-# async def get_current_user(request: Request):
-#     token = request.cookies.get("access_token")
-#     if not token:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED, detail="No token in cookies"
-#         )
-
-#     try:
-#         payload = jwt.decode(
-#             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-#         )
-#         user_id = int(payload.get("sub"))
-#     except (JWTError, ValueError):
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
-#         )
-
-#     user = await UserDAO.find_by_id(user_id)
-#     if not user:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
-#         )
-#     return user
