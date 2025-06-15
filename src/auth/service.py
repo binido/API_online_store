@@ -4,8 +4,9 @@ from fastapi import HTTPException, status
 
 from src.config import settings
 from src.users.dao import UserDAO
+from src.users.schemas import SUserRead
 
-from .schemas import SToken, SUserCreate, SUserLogin, SUserRead
+from .schemas import SToken, SUserCreate, SUserLogin
 from .utils import (
     create_access_token,
     get_password_hash,

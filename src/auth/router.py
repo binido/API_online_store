@@ -1,7 +1,8 @@
-# auth/router.py
 from fastapi import APIRouter, status
 
-from .schemas import SToken, SUserCreate, SUserLogin, SUserRead
+from src.users.schemas import SUserRead
+
+from .schemas import SToken, SUserCreate, SUserLogin
 from .service import authenticate_user, register_user
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])

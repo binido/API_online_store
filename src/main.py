@@ -3,6 +3,7 @@ from fastapi.openapi.utils import get_openapi
 
 from src.auth.router import router as auth_router
 from src.categories.router import router as categories_router
+from src.orders.router import router as orders_router
 from src.products.router import router as products_router
 from src.users.router import router as users_router
 
@@ -41,6 +42,7 @@ app.include_router(users_router, prefix="/api/v1")
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(categories_router, prefix="/api/v1")
 app.include_router(products_router, prefix="/api/v1")
+app.include_router(orders_router, prefix="/api/v1")
 
 
 @app.get("/ping")
