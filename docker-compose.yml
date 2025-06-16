@@ -1,13 +1,13 @@
 services:
     app:
         build: .
+        command: bash -c "poetry run alembic upgrade head && poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000"
         container_name: shop_app
         restart: unless-stopped
         ports:
             - '8000:8000'
         depends_on:
             - db
-        env_file: '.env'
 
     db:
         image: postgres:17.5-alpine
