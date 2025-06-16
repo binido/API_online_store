@@ -19,7 +19,6 @@ async def get_users(
     pagination: PaginationParams = Depends(),
     sort: SortParams = Depends(),
     email: str = Query(None, description="Фильтр по email"),
-    current_user: User = Depends(get_current_user),
 ):
     return await service.list_users_paginated(
         pagination=pagination, sort=sort, email=email
@@ -27,7 +26,7 @@ async def get_users(
 
 
 @router.get("/{user_id}", response_model=SUserRead)
-async def get_user(user_id: int, current_user: User = Depends(get_current_user)):
+async def get_user(user_id: int):
     user = await service.get_user(user_id)
     if not user:
         raise HTTPException(
@@ -37,9 +36,7 @@ async def get_user(user_id: int, current_user: User = Depends(get_current_user))
 
 
 @router.put("/{user_id}", response_model=SUserRead)
-async def update_user(
-    user_id: int, user_data: SUserUpdate, current_user: User = Depends(get_current_user)
-):
+async def update_user(user_id: int, user_data: SUserUpdate):
     user = await service.update_user(user_id, user_data)
     if not user:
         raise HTTPException(
