@@ -89,3 +89,34 @@ async def update_order_status_by_payment_service(
 
     updated_order = await OrderDAO.update(order_id, status=status)
     return await OrderDAO.find_by_id_with_items(updated_order.id)
+
+
+async def list_all_orders_paginated(
+    pagination: PaginationParams,
+    sort: SortParams,
+    status: Optional[OrderStatus] = None,
+) -> PaginatedResponse[SOrderRead]:
+    items, total = await OrderDAO.find_all_orders_paginated(
+        pagination=pagination, sort=sort, status=status
+    )
+
+    return PaginatedResponse.create(
+        items=items, total=total, page=pagination.page, page_size=pagination.page_size
+    )
+
+
+async def get_order_by_id(order_id: int) -> Optional[SOrderRead]:
+    return await OrderDAO.find_by_id_with_items(order_id)
+
+
+async def delete_order(order_id: int) -> Optional[SOrderRead]:
+    return await OrderDAO.delete(order_id)
+
+
+async def update_order(order_id: int, status: OrderStatus) -> Optional[SOrderRead]:
+    order = await OrderDAO.find_by_id(order_id)
+    if not order:
+        return None
+
+    updated_order = await OrderDAO.update(order_id, status=status)
+    return await OrderDAO.find_by_id_with_items(updated_order.id)

@@ -85,6 +85,35 @@ class OrderDAO(BaseDAO):
 
             return items, total
 
+    @classmethod
+    async def find_all_orders_paginated(cls, pagination, sort, status=None):
+        async with async_session_maker() as session:
+            base_query = select(cls.model)
+            if status:
+                base_query = base_query.filter(cls.model.status == status)
+
+            count_query = select(func.count()).select_from(base_query.subquery())
+            total_result = await session.execute(count_query)
+            total = total_result.scalar()
+
+            query = base_query.options(selectinload(cls.model.items))
+
+            sort_field = cls._validate_sort_field(sort.order_by)
+            sort_column = getattr(cls.model, sort_field)
+
+            if sort.order_direction == SortDirection.DESC:
+                query = query.order_by(desc(sort_column))
+            else:
+                query = query.order_by(asc(sort_column))
+
+            offset = (pagination.page - 1) * pagination.page_size
+            query = query.offset(offset).limit(pagination.page_size)
+
+            result = await session.execute(query)
+            items = result.scalars().all()
+
+            return items, total
+
 
 class OrderItemDAO(BaseDAO):
     model = OrderItem
